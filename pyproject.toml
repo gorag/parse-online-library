@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "parse-online-library"
+version = "0.1.0"
+description = ""
+authors = ["gorag <gorbunov.alexey@gmail.com>"]
+readme = "README.md"
+packages = [{include = "parse_online_library"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+requests = "^2.31.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
