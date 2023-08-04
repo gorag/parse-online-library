@@ -87,10 +87,8 @@ if __name__ == '__main__':
             book_info = parse_book_page(book_response.text)
             image_name = Path(urllib.parse.urlsplit(book_info['image_url']).path).name
             pprint(book_info)
-            """
             download_file(book_url, f"{i}. {book_info['name']}.txt", args.books_folder)
             if image_name != "nopic.gif":
                 download_file(book_info['image_url'], image_name, args.images_folder)
-            """
         except HTTPError:
             pass
