@@ -1,3 +1,4 @@
+import argparse
 import urllib.parse
 from pathlib import Path
 from pprint import pprint
@@ -43,7 +44,9 @@ def download_file(url, filename, folder):
 
 def parse_book_page(html):
     soup = BeautifulSoup(html, 'lxml')
-    name = soup.find('div', id='content').find('h1').text.split('::')[0].strip()
+    h1 = soup.find('div', id='content').find('h1').text.split('::')
+    name = h1[0].strip()
+    author = h1[1].strip()
     image_url = urllib.parse.urljoin(
         tululu_url,
         soup.find('div', class_='bookimage').find('img')['src']
@@ -58,6 +61,7 @@ def parse_book_page(html):
     ]
     return {
         "name": name,
+        "author": author,
         "image_url": image_url,
         "comments": comments,
         "genres": genres,
@@ -65,15 +69,28 @@ def parse_book_page(html):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--start_id", type=int, default=1)
+    parser.add_argument("--end_id", type=int, default=10)
+    parser.add_argument("--books_folder", default="books/")
+    parser.add_argument("--images_folder", default="images/")
+    args = parser.parse_args()
+
     tululu_url = "https://tululu.org/"
     book_txt_url = f"{tululu_url}txt.php?id="
     book_page_url = f"{tululu_url}b"
 
-    for i in range(1, 11):
+    for i in range(args.start_id, args.end_id + 1):
         book_url = f"{book_txt_url}{i}"
         try:
             book_response = get_response(f"{book_page_url}{i}/")
-            pprint(parse_book_page(book_response.text))
-            # download_file(book_url, f"{i}. {book_name}.txt")
+            book_info = parse_book_page(book_response.text)
+            image_name = Path(urllib.parse.urlsplit(book_info['image_url']).path).name
+            pprint(book_info)
+            """
+            download_file(book_url, f"{i}. {book_info['name']}.txt", args.books_folder)
+            if image_name != "nopic.gif":
+                download_file(book_info['image_url'], image_name, args.images_folder)
+            """
         except HTTPError:
-            continue
+            pass
